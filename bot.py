@@ -1,6 +1,6 @@
 #Imports
-#Requirements:
-#pip install py-cord dotenv pymongo
+#Requirements (to use this script, install v):
+#pip install py-cord python-dotenv asyncio pymongo[srv] certifi
 import discord
 import os
 import sys
@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 from dotenv import load_dotenv
 from pymongo import *
+from bson.objectid import ObjectId
 
 #Import all speedy jsons, use default json module as failsafe
 try:
@@ -35,6 +36,9 @@ client = MongoClient(
     ),
     tlsCAFile=certifi.where()
 )
+db = client["FBBDB"]
+pointsc = db["points"]
+pointsid = "620cfe72f63ae0339129c774"
 
 #Bot stuff
 pf = "fb."
@@ -65,7 +69,23 @@ def isAuthorized(ctx):
 def isFbb(text):
     """Is text fishbluebot"""
     text = text.strip()
-    if (text == str(bot.user.name)) or (text == str(bot.user)) or (text == "<@" + str(bot.user.id) + ">") or (text == "<@!" + str(bot.user.id) + ">"):
+    if (
+        text == str(
+            bot.user.name
+        )
+    ) or (
+        text == str(
+            bot.user
+        )
+    ) or (
+        text == "<@" + str(
+            bot.user.id
+        ) + ">"
+    ) or (
+        text == "<@!" + str(
+            bot.user.id
+        ) + ">"
+    ):
         return True
     
     else:
@@ -78,6 +98,33 @@ async def on_ready():
     """logged in?"""
     print(f"fishbluebot has logged on in to Discord as {bot.user}!")
 
+@bot.event
+async def on_message(message):
+    #When someone messages
+    if message.author == bot.user:
+        #Is the author of the message the bot?
+        return
+    
+    tempd = pointsc.find_one(
+        {
+            "_id": ObjectId(pointsid)
+        }
+    )
+    
+    try:
+        tempd[str(message.author.id)] += 10
+        
+    except KeyError:
+        tempd[str(message.author.id)] = 10
+    
+    pointsc.delete_one(
+        {
+            "_id": ObjectId(pointsid)
+        }
+    )
+    
+    pointsc.insert_one(tempd)
+    
 @bot.command()
 async def ping(ctx):
     """Ping"""

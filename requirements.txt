@@ -1,0 +1,5 @@
+py-cord
+python-dotenv
+asyncio
+pymongo[srv]
+certifi

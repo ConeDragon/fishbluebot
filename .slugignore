@@ -1,0 +1,13 @@
+# Logo
+logo.png
+
+# Test files
+test.*
+
+# License/README
+LICENSE
+README.md
+
+# Environment files
+.env
+*.env
