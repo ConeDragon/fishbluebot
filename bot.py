@@ -1,12 +1,24 @@
-#Imports
 #Requirements (to use this script, install v):
 #pip install py-cord python-dotenv asyncio pymongo[srv] certifi
+
+#Logging
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename="latest.log",
+    format="[%(levelname)s]: %(message)s"
+)
+
+#Imports
+logging.debug("Importing...")
 import discord
 import os
 import sys
 import random
 import certifi
 import re
+import logging
 
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -26,9 +38,11 @@ except (ModuleNotFoundError, ImportError):
         import json
 
 #Load Environment variables
+logging.debug("Loading env...")
 load_dotenv()
 
 #Mango- I mean, MongoDB stuff
+logging.debug("Opening MongoDB client...")
 client = MongoClient(
     str(
         os.getenv(
@@ -42,6 +56,7 @@ pointsc = db["points"]
 pointsid = "620cfe72f63ae0339129c774"
 
 #Bot stuff
+logging.debug("Defining bot constants...")
 pf = "fb."
 intents = discord.Intents.all()
 bot = commands.Bot(
@@ -52,6 +67,7 @@ bot = commands.Bot(
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
 
 #Reading from file
+logging.debug("Reading things from data JSON file...")
 with open("dat.json", "r") as f:
     #Load crap from data file
     yeetus = json.loads(f.read())
@@ -59,9 +75,10 @@ with open("dat.json", "r") as f:
     del yeetus
 
 # --Functions--
-
+logging.debug("Defining helper functions")
 def isAuthorized(ctx):
     """Is message author in Authorized? (me or Blue)"""
+    logging.debug("call: isAuthorized()")
     if (ctx.message.author.id == 588132098875850752) or (ctx.message.author.id == 832740090094682152):
         return True
     
@@ -70,6 +87,7 @@ def isAuthorized(ctx):
     
 def isFbb(text):
     """Is text fishbluebot"""
+    logging.debug("call: isFbb()")
     text = text.strip()
     if (
         text == str(
@@ -96,6 +114,7 @@ def isFbb(text):
 
 def isMention(text):
     #Is text a mention?
+    logging.debug("call: isMention()")
     global mentionre
     if mentionre.match(text) == None:
         return False
@@ -106,6 +125,7 @@ def isMention(text):
 
 def idFromMention(mention):
     #Get User ID from mention
+    logging.debug("call: idFromMention()")
     if mention.startswith("<@!"):
         return str(mention)[3:-1]
 
@@ -113,15 +133,17 @@ def idFromMention(mention):
         return str(mention)[2:-1]
 
 # --Commands--
-
+logging.debug("Defining commands")
 @bot.event
 async def on_ready():
     """logged in?"""
+    logging.debug("call: on_ready()")
     print(f"fishbluebot has logged on in to Discord as {bot.user}!")
 
 @bot.event
 async def on_message(message):
     #When someone messages
+    logging.debug("call: on_message()")
     if message.author == bot.user:
         #Is the author of the message the bot?
         return
@@ -151,11 +173,13 @@ async def on_message(message):
 @bot.command()
 async def ping(ctx):
     """Ping"""
+    logging.debug("call: ping()")
     await ctx.send("pong")
 
 @bot.command(aliases=["8ball"])
 async def magic8ball(ctx, *args):
-    """Magic 8 ball. Ask it your questions."""
+    """Magic 8-ball. Ask it your questions."""
+    logging.debug("call: magic8ball()")
     global m8answers
     await ctx.send(
         m8answers[
@@ -172,9 +196,11 @@ async def magic8ball(ctx, *args):
 @bot.command()
 async def killswitch(ctx):
     """Killswitch"""
+    logging.debug("call: killswitch()")
     if isAuthorized(ctx):
         await ctx.send("I am now commiting die.")
         print("ouchie someone killed me")
+        logging.warning("Exiting...")
         sys.exit()
         
     else:
@@ -183,6 +209,7 @@ async def killswitch(ctx):
 @bot.command()
 async def points(ctx, user=None):
     """Show number of points of others, or yourself."""
+    logging.debug("call: points()")
     if user == None:
         user = ctx.message.author.id
 
@@ -204,6 +231,42 @@ async def points(ctx, user=None):
 
     except KeyError:
         await ctx.send("0 points.")
+
+@bot.command()
+async def leaderboard(ctx):
+    """Leaderboard function for points."""
+    logging.debug("call: leaderboard()")
+    global output, thingy
+    tempd = pointsc.find_one(
+        {
+            "_id": ObjectId(pointsid)
+        }
+    )
+    del tempd["_id"]
+    thingy = [[k, v] for k, v in tempd.items()]
+    thingy = sorted(thingy, key=lambda x: x[1])[::-1]
+
+    output = ""
+    async def add(a, n):
+        global output, thingy
+        try:
+            temp = await bot.fetch_user(thingy[n][0])
+            output += str(a) + str(temp.name) + ": " + str(thingy[n][1]) + "\n"
+            del temp
+            return 0
+
+        except KeyError:
+            print("")
+            return 1
+
+    if not add("🥇", 0):
+        if not add("🥈", 1):
+            if not add("🥉", 2):
+                if not add("🏵️", 3):
+                    add("🏵️", 4)
+
+    await ctx.send(output)
+    del output, thingy
 
 bot.run(
     str(
