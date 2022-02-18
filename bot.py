@@ -6,6 +6,7 @@ import os
 import sys
 import random
 import certifi
+import re
 
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -48,6 +49,7 @@ bot = commands.Bot(
     strip_after_prefix=True,
     intents=intents
 )
+mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
 
 #Reading from file
 with open("dat.json", "r") as f:
@@ -90,6 +92,25 @@ def isFbb(text):
     
     else:
         return False
+
+
+def isMention(text):
+    #Is text a mention?
+    global mentionre
+    if mentionre.match(text) == None:
+        return False
+
+    else:
+        return True
+
+
+def idFromMention(mention):
+    #Get User ID from mention
+    if mention.startswith("<@!"):
+        return str(mention)[3:-1]
+
+    else:
+        return str(mention)[2:-1]
 
 # --Commands--
 
@@ -134,6 +155,7 @@ async def ping(ctx):
 
 @bot.command(aliases=["8ball"])
 async def magic8ball(ctx, *args):
+    """Magic 8 ball. Ask it your questions."""
     global m8answers
     await ctx.send(
         m8answers[
@@ -157,6 +179,31 @@ async def killswitch(ctx):
         
     else:
         await ctx.send("rude why are you trying to kill me >:(")
+
+@bot.command()
+async def points(ctx, user=None):
+    """Show number of points of others, or yourself."""
+    if user == None:
+        user = ctx.message.author.id
+
+    elif not isMention(user):
+        await ctx.send("That person isn't a mention.")
+        return
+
+    else:
+        user = idFromMention(user)
+
+    tempd = pointsc.find_one(
+        {
+            "_id": ObjectId(pointsid)
+        }
+    )
+
+    try:
+        await ctx.send(f"{tempd[str(user)]} points.")
+
+    except KeyError:
+        await ctx.send("0 points.")
 
 bot.run(
     str(
