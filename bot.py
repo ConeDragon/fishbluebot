@@ -4,6 +4,8 @@
 #Logging
 import logging
 
+with open("latest.log", "w") as f: pass
+
 logging.basicConfig(
     level=logging.DEBUG,
     filename="latest.log",
