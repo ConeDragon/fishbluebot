@@ -251,22 +251,27 @@ async def leaderboard(ctx):
         global output, thingy
         try:
             temp = await bot.fetch_user(thingy[n][0])
-            output += str(a) + str(temp.name) + ": " + str(thingy[n][1]) + "\n"
+            output += f"{str(a) + str(temp.name)} - {str(thingy[n][1])} points\n"
             del temp
             return 0
 
-        except KeyError:
-            print("")
+        except KeyError as error:
+            logging.debug("Error occured in leaderboard.add(), could be incomplete leaderboard")
+            logging.warning(f"{type(error).name}: {str(error)}")
             return 1
 
-    if not add("🥇", 0):
-        if not add("🥈", 1):
-            if not add("🥉", 2):
-                if not add("🏵️", 3):
-                    add("🏵️", 4)
+        except Exception as error:
+            logging.debug("Unexpected error occured in leaderboard.add().")
+            logging.error(f"{type(error).name}: {str(error)}")
+            return 1
+
+    if not await add("🥇", 0):
+        if not await add("🥈", 1):
+            if not await add("🥉", 2):
+                if not await add("🏵️", 3):
+                    await add("🏵️", 4)
 
     await ctx.send(output)
-    del output, thingy
 
 bot.run(
     str(
