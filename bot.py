@@ -207,14 +207,18 @@ async def killswitch(ctx):
         await ctx.send("rude why are you trying to kill me >:(")
 
 @bot.command()
-async def points(ctx, user=None):
+async def points(ctx, user=None, silent=False):
     """Show number of points of others, or yourself."""
     logging.debug("call: points()")
     if user == None:
         user = ctx.message.author.id
 
     elif not isMention(user):
-        await ctx.send("That person isn't a mention.")
+        if not silent:
+            await ctx.send("That person isn't a mention.")
+
+        else:
+            logging.info("That person isn't a mention (callback from points())")
         return
 
     else:
@@ -227,10 +231,16 @@ async def points(ctx, user=None):
     )
 
     try:
-        await ctx.send(f"{tempd[str(user)]} points.")
+        out = f"{tempd[str(user)]} points"
 
     except KeyError:
-        await ctx.send("0 points.")
+        out = "0 points"
+
+    if not silent:
+        await ctx.send(out)
+
+    else:
+        return out
 
 @bot.command()
 async def leaderboard(ctx):
@@ -261,7 +271,7 @@ async def leaderboard(ctx):
             del temp
             return 0
 
-        except KeyError as error:
+        except (KeyError) as error:
             logging.debug("Error occured in leaderboard.add(), could be incomplete leaderboard")
             logging.warning(f"{type(error).name}: {str(error)}")
             return 1
@@ -276,6 +286,9 @@ async def leaderboard(ctx):
             if not await add("🥉", 2):
                 if not await add("🏵️", 3):
                     await add("🏵️", 4)
+
+    curp = await points(ctx, silent=True)
+    output += f"{ctx.message.author.name} - {curp}"
 
     await ctx.send(output)
 
