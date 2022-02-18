@@ -251,6 +251,12 @@ async def leaderboard(ctx):
         global output, thingy
         try:
             temp = await bot.fetch_user(thingy[n][0])
+
+            if temp.bot:
+                del thingy[n]
+                await add(a, n)
+                return
+
             output += f"{str(a) + str(temp.name)} - {str(thingy[n][1])} points\n"
             del temp
             return 0

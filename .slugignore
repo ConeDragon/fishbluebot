@@ -11,3 +11,6 @@ README.md
 # Environment files
 .env
 *.env
+
+# Hardpull
+__hardpull__.sh
