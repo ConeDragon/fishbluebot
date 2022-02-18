@@ -130,3 +130,10 @@ dmypy.json
 
 # Test
 test.*
+
+# Freezer
+__freeze__.bat
+
+# Launcher
+Launch.exe
+Launch.py

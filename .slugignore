@@ -11,3 +11,10 @@ README.md
 # Environment files
 .env
 *.env
+
+# Freezer
+__freeze__.bat
+
+# Launcher
+Launch.exe
+Launch.py
