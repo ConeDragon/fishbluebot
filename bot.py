@@ -161,11 +161,9 @@ async def on_message(message):
 
     try:
         dif = time.time() - msgst[message.author.id]
-        msgst[message.author.id] = time.time()
 
     except KeyError:
-        msgst[message.author.id] = time.time()
-        dif = 9 #Could be any number >0.5
+        dif = 7 #Could be any number >0.5
 
     if dif > 0.5:
         tempd = pointsc.find_one(
@@ -188,6 +186,7 @@ async def on_message(message):
 
         pointsc.insert_one(tempd)
 
+    msgst[message.author.id] = time.time()
     await bot.process_commands(message)
     
 @bot.command()
