@@ -244,6 +244,25 @@ async def bruh(ctx):
 ██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
 ╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
+@bot.command()
+async def tree(ctx, size=3):
+    """Prints little trees."""
+    size = int(size)
+    a = 1
+    b = 2 * size - 1
+    out = ""
+
+    char = "*"
+
+    for i in range(0, size):
+        out += "".join([char for j in range(0, a)]).center(b) + "\n"
+        a += 2
+
+    for i in range(0, int(math.ceil(size / 20))):
+        out += char.center(b) + "\n"
+
+    await ctx.send("```" + chr(8203) + out[:-1] + "```")
+
 bot.run(
     str(
         os.getenv(
