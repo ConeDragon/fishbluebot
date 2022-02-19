@@ -149,7 +149,6 @@ def idFromMention(mention):
     else:
         return str(mention)[2:-1]
 
-
 # --Discord Events--
 logging.debug("Defining commands...")
 @bot.event
@@ -210,6 +209,40 @@ async def killswitch(ctx):
         
     else:
         await ctx.send("rude why are you trying to kill me >:(")
+
+@bot.command()
+async def kill(ctx, person):
+    """Kill people. Idk y."""
+    logging.debug("call: kill()")
+    await ctx.send(
+        ctx.message.author.name.replace(
+            "_",
+            "\\_"
+        ).replace(
+            "*",
+            "\\*"
+        ).replace(
+            "|",
+            "\\|"
+        ).replace(
+            "~",
+            "\\~"
+        ).replace(
+            "`",
+            "\\`"
+        ) + f" (>0益0)>))))))))))))))) (×\\_×;) {person}"
+    )
+
+@bot.command()
+async def bruh(ctx):
+    """Bruh."""
+    logging.debug("call: bruh()")
+    await ctx.send("""██████╗░██████╗░██╗░░░██╗██╗░░██╗░░░
+██╔══██╗██╔══██╗██║░░░██║██║░░██║░░░
+██████╦╝██████╔╝██║░░░██║███████║░░░
+██╔══██╗██╔══██╗██║░░░██║██╔══██║░░░
+██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
+╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
 bot.run(
     str(
