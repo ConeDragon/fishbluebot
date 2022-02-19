@@ -11,6 +11,7 @@ logging.basicConfig(
     filename="latest.log",
     format="[%(levelname)s]: %(message)s"
 )
+logging.debug("1.0.0.1")
 
 #Imports
 logging.debug("Importing...")
@@ -259,7 +260,7 @@ async def points(ctx, user=None, silent=False):
         await ctx.send(out)
 
     else:
-        return out
+        return tempd[str(user)]
 
 @bot.command(aliases=["lb"])
 async def leaderboard(ctx):
@@ -274,6 +275,10 @@ async def leaderboard(ctx):
     del tempd["_id"]
     thingy = [[k, v] for k, v in tempd.items()]
     thingy = sorted(thingy, key=lambda x: x[1])[::-1]
+    places = []
+
+    for item in thingy:
+        places.append(item[0])
 
     output = ""
     async def add(a, n):
@@ -307,7 +312,8 @@ async def leaderboard(ctx):
                     await add("🏵️", 4)
 
     curp = await points(ctx, silent=True)
-    output += f"{ctx.message.author.name} - {curp}"
+    curp = int(curp)
+    output += f"{ctx.message.author.name} - {curp} points (Place #" + str(places.index(str(ctx.message.author.id)) + 1) + ")"
 
     await ctx.send(output)
 
