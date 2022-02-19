@@ -21,7 +21,6 @@ import sys
 import random
 import certifi
 import re
-import logging
 import time
 import math
 
