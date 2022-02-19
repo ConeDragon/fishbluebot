@@ -21,6 +21,8 @@ import random
 import certifi
 import re
 import logging
+import time
+import math
 
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -67,6 +69,7 @@ bot = commands.Bot(
     intents=intents
 )
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
+msgst = {}
 
 #Reading from file
 logging.debug("Reading things from data JSON file...")
@@ -134,8 +137,9 @@ def idFromMention(mention):
     else:
         return str(mention)[2:-1]
 
+
 # --Commands--
-logging.debug("Defining commands")
+logging.debug("Defining commands...")
 @bot.event
 async def on_ready():
     """logged in?"""
@@ -145,31 +149,45 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     #When someone messages
+    global msgst
     logging.debug("call: on_message()")
+
     if message.author == bot.user:
         #Is the author of the message the bot?
         return
-    
-    tempd = pointsc.find_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
-    )
-    
+
+    if message.author.bot:
+        return
+
     try:
-        tempd[str(message.author.id)] += 10
-        
+        dif = round(time.time() - msgst[message.author.id])
+        msgst[message.author.id] = time.time()
+
     except KeyError:
-        tempd[str(message.author.id)] = 10
-    
-    pointsc.delete_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
-    )
-    
-    pointsc.insert_one(tempd)
-    
+        msgst[message.author.id] = time.time()
+        dif = 9 #Could be any number >1
+
+    if dif > 1:
+        tempd = pointsc.find_one(
+            {
+                "_id": ObjectId(pointsid)
+            }
+        )
+
+        try:
+            tempd[str(message.author.id)] += 10
+
+        except KeyError:
+            tempd[str(message.author.id)] = 10
+
+        pointsc.delete_one(
+            {
+                "_id": ObjectId(pointsid)
+            }
+        )
+
+        pointsc.insert_one(tempd)
+
     await bot.process_commands(message)
     
 @bot.command()
@@ -244,7 +262,7 @@ async def points(ctx, user=None, silent=False):
     else:
         return out
 
-@bot.command()
+@bot.command(aliases=["lb"])
 async def leaderboard(ctx):
     """Leaderboard function for points."""
     logging.debug("call: leaderboard()")
