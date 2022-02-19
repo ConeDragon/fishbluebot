@@ -11,7 +11,7 @@ logging.basicConfig(
     filename="latest.log",
     format="[%(levelname)s]: %(message)s"
 )
-logging.debug("1.0.0.1")
+logging.debug("1.0.0.2")
 
 #Imports
 logging.debug("Importing...")
@@ -166,7 +166,7 @@ async def on_message(message):
     except KeyError:
         dif = 7 #Could be any number >0.5
 
-    if dif > 0.5:
+    if dif > 1:
         tempd = pointsc.find_one(
             {
                 "_id": ObjectId(pointsid)
@@ -186,8 +186,8 @@ async def on_message(message):
         )
 
         pointsc.insert_one(tempd)
+        msgst[message.author.id] = time.time()
 
-    msgst[message.author.id] = time.time()
     await bot.process_commands(message)
     
 @bot.command()
