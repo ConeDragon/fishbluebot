@@ -11,7 +11,7 @@ logging.basicConfig(
     filename="latest.log",
     format="[%(levelname)s]: %(message)s"
 )
-logging.debug("1.0.0.1")
+logging.debug("1.0.0.2")
 
 #Imports
 logging.debug("Importing...")
@@ -21,7 +21,6 @@ import sys
 import random
 import certifi
 import re
-import logging
 import time
 import math
 
@@ -30,6 +29,7 @@ from discord.utils import get
 from dotenv import load_dotenv
 from pymongo import *
 from bson.objectid import ObjectId
+from decimal import Decimal
 
 #Import all speedy jsons, use default json module as failsafe
 try:
@@ -57,8 +57,6 @@ client = MongoClient(
     tlsCAFile=certifi.where()
 )
 db = client["FBBDB"]
-pointsc = db["points"]
-pointsid = "620cfe72f63ae0339129c774"
 
 #Bot stuff
 logging.debug("Defining bot constants...")
@@ -82,6 +80,19 @@ with open("dat.json", "r") as f:
 
 # --Functions--
 logging.debug("Defining helper functions")
+def prec(n):
+    return Decimal(str(n))
+
+def bround(n, a=0):
+    return prec(
+        round(
+            prec(
+                n
+            ),
+            a
+        )
+    )
+
 def isAuthorized(ctx):
     """Is message author in Authorized? (me or Blue)"""
     logging.debug("call: isAuthorized()")
@@ -138,8 +149,7 @@ def idFromMention(mention):
     else:
         return str(mention)[2:-1]
 
-
-# --Commands--
+# --Discord Events--
 logging.debug("Defining commands...")
 @bot.event
 async def on_ready():
@@ -158,38 +168,12 @@ async def on_message(message):
         return
 
     if message.author.bot:
-        return
+        return #Prevent bots from running commands.
 
-    try:
-        dif = time.time() - msgst[message.author.id]
-
-    except KeyError:
-        dif = 7 #Could be any number >0.5
-
-    if dif > 0.5:
-        tempd = pointsc.find_one(
-            {
-                "_id": ObjectId(pointsid)
-            }
-        )
-
-        try:
-            tempd[str(message.author.id)] += 10
-
-        except KeyError:
-            tempd[str(message.author.id)] = 10
-
-        pointsc.delete_one(
-            {
-                "_id": ObjectId(pointsid)
-            }
-        )
-
-        pointsc.insert_one(tempd)
-
-    msgst[message.author.id] = time.time()
     await bot.process_commands(message)
-    
+
+# --Commands--
+
 @bot.command()
 async def ping(ctx):
     """Ping"""
@@ -227,95 +211,38 @@ async def killswitch(ctx):
         await ctx.send("rude why are you trying to kill me >:(")
 
 @bot.command()
-async def points(ctx, user=None, silent=False):
-    """Show number of points of others, or yourself."""
-    logging.debug("call: points()")
-    if user == None:
-        user = ctx.message.author.id
-
-    elif not isMention(user):
-        if not silent:
-            await ctx.send("That person isn't a mention.")
-
-        else:
-            logging.info("That person isn't a mention (callback from points())")
-        return
-
-    else:
-        user = idFromMention(user)
-
-    tempd = pointsc.find_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
+async def kill(ctx, person):
+    """Kill people. Idk y."""
+    logging.debug("call: kill()")
+    await ctx.send(
+        ctx.message.author.name.replace(
+            "_",
+            "\\_"
+        ).replace(
+            "*",
+            "\\*"
+        ).replace(
+            "|",
+            "\\|"
+        ).replace(
+            "~",
+            "\\~"
+        ).replace(
+            "`",
+            "\\`"
+        ) + f" (>0益0)>))))))))))))))) (×\\_×;) {person}"
     )
 
-    try:
-        out = f"{tempd[str(user)]} points"
-
-    except KeyError:
-        out = "0 points"
-
-    if not silent:
-        await ctx.send(out)
-
-    else:
-        return tempd[str(user)]
-
-@bot.command(aliases=["lb"])
-async def leaderboard(ctx):
-    """Leaderboard function for points."""
-    logging.debug("call: leaderboard()")
-    global output, thingy
-    tempd = pointsc.find_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
-    )
-    del tempd["_id"]
-    thingy = [[k, v] for k, v in tempd.items()]
-    thingy = sorted(thingy, key=lambda x: x[1])[::-1]
-    places = []
-
-    for item in thingy:
-        places.append(item[0])
-
-    output = ""
-    async def add(a, n):
-        global output, thingy
-        try:
-            temp = await bot.fetch_user(thingy[n][0])
-
-            if temp.bot:
-                del thingy[n]
-                await add(a, n)
-                return
-
-            output += f"{str(a) + str(temp.name)} - {str(thingy[n][1])} points\n"
-            del temp
-            return 0
-
-        except (KeyError) as error:
-            logging.debug("Error occured in leaderboard.add(), could be incomplete leaderboard")
-            logging.warning(f"{type(error).name}: {str(error)}")
-            return 1
-
-        except Exception as error:
-            logging.debug("Unexpected error occured in leaderboard.add().")
-            logging.error(f"{type(error).name}: {str(error)}")
-            return 1
-
-    if not await add("🥇", 0):
-        if not await add("🥈", 1):
-            if not await add("🥉", 2):
-                if not await add("🏵️", 3):
-                    await add("🏵️", 4)
-
-    curp = await points(ctx, silent=True)
-    curp = int(curp)
-    output += f"{ctx.message.author.name} - {curp} points (Place #" + str(places.index(str(ctx.message.author.id)) + 1) + ")"
-
-    await ctx.send(output)
+@bot.command()
+async def bruh(ctx):
+    """Bruh."""
+    logging.debug("call: bruh()")
+    await ctx.send("""██████╗░██████╗░██╗░░░██╗██╗░░██╗░░░
+██╔══██╗██╔══██╗██║░░░██║██║░░██║░░░
+██████╦╝██████╔╝██║░░░██║███████║░░░
+██╔══██╗██╔══██╗██║░░░██║██╔══██║░░░
+██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
+╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
 bot.run(
     str(
