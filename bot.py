@@ -160,14 +160,14 @@ async def on_message(message):
         return
 
     try:
-        dif = round(time.time() - msgst[message.author.id])
+        dif = time.time() - msgst[message.author.id]
         msgst[message.author.id] = time.time()
 
     except KeyError:
         msgst[message.author.id] = time.time()
-        dif = 9 #Could be any number >1
+        dif = 9 #Could be any number >0.5
 
-    if dif > 1:
+    if dif > 0.5:
         tempd = pointsc.find_one(
             {
                 "_id": ObjectId(pointsid)
