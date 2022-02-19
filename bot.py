@@ -139,7 +139,7 @@ def idFromMention(mention):
         return str(mention)[2:-1]
 
 
-# --Commands--
+# --Discord Events--
 logging.debug("Defining commands...")
 @bot.event
 async def on_ready():
@@ -158,7 +158,7 @@ async def on_message(message):
         return
 
     if message.author.bot:
-        return
+        return #Prevent bots from running commands.
 
     try:
         dif = time.time() - msgst[message.author.id]
@@ -189,7 +189,9 @@ async def on_message(message):
         msgst[message.author.id] = time.time()
 
     await bot.process_commands(message)
-    
+
+# --Commands--
+
 @bot.command()
 async def ping(ctx):
     """Ping"""
@@ -313,7 +315,14 @@ async def leaderboard(ctx):
 
     curp = await points(ctx, silent=True)
     curp = int(curp)
-    output += f"{ctx.message.author.name} - {curp} points (Place #" + str(places.index(str(ctx.message.author.id)) + 1) + ")"
+
+    try:
+        yay = "#" + str(places.index(str(ctx.message.author.id)) + 1)
+
+    except ValueError:
+        yay = "Last"
+
+    output += f"{ctx.message.author.name} - {curp} points (Place " + yay + ")"
 
     await ctx.send(output)
 
