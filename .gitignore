@@ -133,3 +133,6 @@ test.*
 
 # Hardpull
 __hardpull__.sh
+
+# Backup
+bak.py

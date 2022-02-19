@@ -4,11 +4,14 @@
 #Logging
 import logging
 
+with open("latest.log", "w") as f: pass
+
 logging.basicConfig(
     level=logging.DEBUG,
     filename="latest.log",
     format="[%(levelname)s]: %(message)s"
 )
+logging.debug("1.0.0.1")
 
 #Imports
 logging.debug("Importing...")
@@ -19,6 +22,8 @@ import random
 import certifi
 import re
 import logging
+import time
+import math
 
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -65,6 +70,7 @@ bot = commands.Bot(
     intents=intents
 )
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
+msgst = {}
 
 #Reading from file
 logging.debug("Reading things from data JSON file...")
@@ -132,8 +138,9 @@ def idFromMention(mention):
     else:
         return str(mention)[2:-1]
 
+
 # --Commands--
-logging.debug("Defining commands")
+logging.debug("Defining commands...")
 @bot.event
 async def on_ready():
     """logged in?"""
@@ -143,31 +150,44 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     #When someone messages
+    global msgst
     logging.debug("call: on_message()")
+
     if message.author == bot.user:
         #Is the author of the message the bot?
         return
-    
-    tempd = pointsc.find_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
-    )
-    
+
+    if message.author.bot:
+        return
+
     try:
-        tempd[str(message.author.id)] += 10
-        
+        dif = time.time() - msgst[message.author.id]
+
     except KeyError:
-        tempd[str(message.author.id)] = 10
-    
-    pointsc.delete_one(
-        {
-            "_id": ObjectId(pointsid)
-        }
-    )
-    
-    pointsc.insert_one(tempd)
-    
+        dif = 7 #Could be any number >0.5
+
+    if dif > 0.5:
+        tempd = pointsc.find_one(
+            {
+                "_id": ObjectId(pointsid)
+            }
+        )
+
+        try:
+            tempd[str(message.author.id)] += 10
+
+        except KeyError:
+            tempd[str(message.author.id)] = 10
+
+        pointsc.delete_one(
+            {
+                "_id": ObjectId(pointsid)
+            }
+        )
+
+        pointsc.insert_one(tempd)
+
+    msgst[message.author.id] = time.time()
     await bot.process_commands(message)
     
 @bot.command()
@@ -240,9 +260,9 @@ async def points(ctx, user=None, silent=False):
         await ctx.send(out)
 
     else:
-        return out
+        return tempd[str(user)]
 
-@bot.command()
+@bot.command(aliases=["lb"])
 async def leaderboard(ctx):
     """Leaderboard function for points."""
     logging.debug("call: leaderboard()")
@@ -255,6 +275,10 @@ async def leaderboard(ctx):
     del tempd["_id"]
     thingy = [[k, v] for k, v in tempd.items()]
     thingy = sorted(thingy, key=lambda x: x[1])[::-1]
+    places = []
+
+    for item in thingy:
+        places.append(item[0])
 
     output = ""
     async def add(a, n):
@@ -288,7 +312,8 @@ async def leaderboard(ctx):
                     await add("🏵️", 4)
 
     curp = await points(ctx, silent=True)
-    output += f"{ctx.message.author.name} - {curp}"
+    curp = int(curp)
+    output += f"{ctx.message.author.name} - {curp} points (Place #" + str(places.index(str(ctx.message.author.id)) + 1) + ")"
 
     await ctx.send(output)
 
