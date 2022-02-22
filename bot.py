@@ -23,6 +23,7 @@ import certifi
 import re
 import time
 import math
+import requests
 
 from discord.ext import commands, tasks
 from discord.utils import get
@@ -69,6 +70,7 @@ bot = commands.Bot(
 )
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
 msgst = {}
+kawaiit = "767200055652253719.cTHpJ7bN9V0xFjdK5pWh"
 
 #Reading from file
 logging.debug("Reading things from data JSON file...")
@@ -76,6 +78,7 @@ with open("dat.json", "r") as f:
     #Load crap from data file
     yeetus = json.loads(f.read())
     m8answers = yeetus["8ball"]
+    jokes = yeetus["jokes"]
     del yeetus
 
 # --Functions--
@@ -93,10 +96,10 @@ def bround(n, a=0):
         )
     )
 
-def isAuthorized(ctx):
+def isAuthorized(i):
     """Is message author in Authorized? (me or Blue)"""
     logging.debug("call: isAuthorized()")
-    if (ctx.message.author.id == 588132098875850752) or (ctx.message.author.id == 832740090094682152):
+    if (i == 588132098875850752) or (i == 832740090094682152):
         return True
     
     else:
@@ -148,6 +151,10 @@ def idFromMention(mention):
 
     else:
         return str(mention)[2:-1]
+
+def kawaii(sub):
+    r = requests.get(f"https://kawaii.red/api/gif/{sub}/token={kawaiit}/")
+    return str(r.json()['response'])
 
 # --Discord Events--
 logging.debug("Defining commands...")
@@ -201,7 +208,8 @@ async def magic8ball(ctx, *args):
 async def killswitch(ctx):
     """Killswitch"""
     logging.debug("call: killswitch()")
-    if isAuthorized(ctx):
+    logging.info(f"Someone attempted to kill the bot, ID: {ctx.message.author.id}")
+    if isAuthorized(ctx.message.author.id):
         await ctx.send("I am now commiting die.")
         print("ouchie someone killed me")
         logging.warning("Exiting...")
@@ -214,24 +222,34 @@ async def killswitch(ctx):
 async def kill(ctx, person):
     """Kill people. Idk y."""
     logging.debug("call: kill()")
-    await ctx.send(
-        ctx.message.author.name.replace(
-            "_",
-            "\\_"
-        ).replace(
-            "*",
-            "\\*"
-        ).replace(
-            "|",
-            "\\|"
-        ).replace(
-            "~",
-            "\\~"
-        ).replace(
-            "`",
-            "\\`"
-        ) + f" (>0益0)>))))))))))))))) (×\\_×;) {person}"
+    if isMention(person):
+        if int(ctx.message.author.id) == int(idFromMention(person)):
+            await ctx.send("Aw c'mon, don't kill yourself.")
+            return
+
+    else:
+        if person.strip() == ctx.message.author.name:
+            await ctx.send("Aw c'mon, don't kill yourself.")
+            return
+
+    if ("@everyone" in person) or ("@here" in person):
+        await ctx.send("Mass genocide isn't allowed yet. Try again later.")
+        return
+
+    if isMention(person):
+        person = await bot.fetch_user(idFromMention(person))
+        person = person.name
+
+    else:
+        pass
+
+    embed = discord.Embed(
+        title=f"{ctx.message.author.name} has violently murdered {person}!",
+        description="oof",
     )
+    embed.set_image(url=kawaii("kill"))
+
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def bruh(ctx):
@@ -247,21 +265,54 @@ async def bruh(ctx):
 @bot.command()
 async def tree(ctx, size=3):
     """Prints little trees."""
-    size = int(size)
-    a = 1
-    b = 2 * size - 1
-    out = ""
+    if size > 30:
+        await ctx.send("DoSing me is illegal at the moment.")
+        return
 
-    char = "*"
+    else:
+        size = int(size)
+        a = 1
+        b = 2 * size - 1
+        out = ""
 
-    for i in range(0, size):
-        out += "".join([char for j in range(0, a)]).center(b) + "\n"
-        a += 2
+        char = "*"
 
-    for i in range(0, int(math.ceil(size / 20))):
-        out += char.center(b) + "\n"
+        for i in range(0, size):
+            out += "".join([char for j in range(0, a)]).center(b) + "\n"
+            a += 2
 
-    await ctx.send("```" + chr(8203) + out[:-1] + "```")
+        for i in range(0, int(math.ceil(size / 20))):
+            out += char.center(b) + "\n"
+
+        await ctx.send("```" + chr(8203) + out[:-1] + "```")
+
+@bot.command()
+async def logsclear(ctx):
+    """Clears logs of FBB."""
+    if isAuthorized(ctx.message.author.id):
+        with open("latest.log", "w") as f: pass
+        await ctx.send("Logs have been erased.")
+        print("Logs have been erased.")
+
+    else:
+        await ctx.send("You don't have sufficient permissions to run this command.")
+
+@bot.command()
+async def joke(ctx):
+    """Prints a random corny joke."""
+    logging.debug("call: joke()")
+    global jokes
+    await ctx.send(random.choice(jokes))
+
+@bot.command(aliases=["sudo-echo"])
+async def sudo_echo(ctx, *args):
+    """Echoes your text."""
+    if isAuthorized(ctx.message.author.id):
+        await ctx.send(" ".join(args))
+        await ctx.message.delete()
+
+    else:
+        return
 
 bot.run(
     str(
