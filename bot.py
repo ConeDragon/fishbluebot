@@ -304,15 +304,13 @@ async def joke(ctx):
     global jokes
     await ctx.send(random.choice(jokes))
 
-@bot.command(aliases=["sudo-echo"])
-async def sudo_echo(ctx, *args):
-    """Echoes your text."""
-    if isAuthorized(ctx.message.author.id):
-        await ctx.send(" ".join(args))
-        await ctx.message.delete()
+@bot.command()
+async def coinflip(ctx):
+    if random.randint(0, 1):
+        await ctx.send("Heads!")
 
     else:
-        return
+        await ctx.send("Tails!")
 
 bot.run(
     str(
