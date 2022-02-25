@@ -1,3 +1,4 @@
+# Doesn't support slash commands, probs gonna get yeeted by Discord
 #Requirements (to use this script, install v):
 #pip install py-cord python-dotenv asyncio pymongo[srv] certifi
 
@@ -64,13 +65,12 @@ db = client["FBBDB"]
 #Bot stuff
 logging.debug("Defining bot constants...")
 pf = "fb."
-
 intents = discord.Intents.all()
-bot = discord.Bot(
+bot = commands.Bot(
+    command_prefix=pf,
     strip_after_prefix=True,
     intents=intents
 )
-
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
 msgst = {}
 kawaiit = "767200055652253719.cTHpJ7bN9V0xFjdK5pWh"
@@ -180,6 +180,8 @@ async def on_message(message):
     if message.author.bot:
         return #Prevent bots from running commands.
 
+    await bot.process_commands(message)
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
@@ -217,13 +219,13 @@ async def on_command_error(ctx, error):
 
 # --Commands--
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def ping(ctx):
     """Ping"""
     logging.debug("call: ping()")
     await ctx.send("pong")
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
+@bot.command(aliases=["8ball"])
 async def magic8ball(ctx, *args):
     """Magic 8-ball. Ask it your questions."""
     logging.debug("call: magic8ball()")
@@ -240,7 +242,7 @@ async def magic8ball(ctx, *args):
         ]
     )
     
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def killswitch(ctx):
     """Killswitch"""
     logging.debug("call: killswitch()")
@@ -254,7 +256,7 @@ async def killswitch(ctx):
     else:
         await ctx.send("rude why are you trying to kill me >:(")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def kill(ctx, person):
     """Kill people. Idk y."""
     logging.debug("call: kill()")
@@ -287,7 +289,7 @@ async def kill(ctx, person):
 
     await ctx.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def bruh(ctx):
     """Bruh."""
     logging.debug("call: bruh()")
@@ -298,7 +300,7 @@ async def bruh(ctx):
 ██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
 ╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def tree(ctx, size=3):
     """Prints little trees."""
     if size > 30:
@@ -322,7 +324,7 @@ async def tree(ctx, size=3):
 
         await ctx.send("```" + chr(8203) + out[:-1] + "```")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def logsclear(ctx):
     """Clears logs of FBB."""
     if isAuthorized(ctx.message.author.id):
@@ -333,7 +335,7 @@ async def logsclear(ctx):
     else:
         await ctx.send("You don't have sufficient permissions to run this command.")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def joke(ctx):
     """Prints a random corny joke."""
     logging.debug("call: joke()")
@@ -354,7 +356,7 @@ async def joke(ctx):
         await asyncio.sleep(1)
         await ctx.send(jk["delivery"])
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def coinflip(ctx):
     """Flips a coin."""
     if random.randint(0, 1):
@@ -362,6 +364,39 @@ async def coinflip(ctx):
 
     else:
         await ctx.send("Tails!")
+
+@bot.command()
+async def kiss(ctx, person):
+    """Kill people. Idk y."""
+    logging.debug("call: kill()")
+    if isMention(person):
+        if int(ctx.message.author.id) == int(idFromMention(person)):
+            await ctx.send("wut.")
+            return
+
+    else:
+        if person.strip() == ctx.message.author.name:
+            await ctx.send("wut.")
+            return
+
+    if ("@everyone" in person) or ("@here" in person):
+        await ctx.send("oof ur being real amorous here")
+        return
+
+    if isMention(person):
+        person = await bot.fetch_user(int(idFromMention(person)))
+        person = person.name
+
+    else:
+        pass
+
+    embed = discord.Embed(
+        title=f"{ctx.message.author.name} has kissed {person}!",
+        description="idk what to say tbh",
+    )
+    embed.set_image(url=kawaii("kiss"))
+
+    await ctx.send(embed=embed)
 
 bot.run(
     str(
