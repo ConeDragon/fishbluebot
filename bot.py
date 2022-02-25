@@ -404,9 +404,8 @@ async def kiss(ctx, person):
 
     await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(aliases=["new-ticket", "new_ticket"])
 async def newticket(ctx, *args):
-
     if len(args) < 1:
         topic = "unknown topic"
 
@@ -414,7 +413,13 @@ async def newticket(ctx, *args):
         topic = " ".join(args)
 
     ticket_channel = await ctx.guild.create_text_channel(
-        f"ticket-{ctx.message.author.name}-{topic}"
+        f"ticket-{ctx.message.author.name}-{topic}",
+        category=get(
+            bot.get_guild(
+                837710846280073279
+            ).categories,
+            id=946872728361791499
+        )
     )
     await ticket_channel.set_permissions(
         ctx.guild.get_role(
@@ -454,7 +459,7 @@ async def newticket(ctx, *args):
     )
     await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
     if "ticket-" in ctx.channel.name:
         await ctx.channel.delete()
