@@ -111,7 +111,8 @@ def isAuthorized(i):
 def isFbb(text):
     """Is text fishbluebot"""
     logging.debug("call: isFbb()")
-    text = text.strip()
+    print(text)
+    text = str(text)
     if (
         text == str(
             bot.user.name
@@ -359,6 +360,7 @@ async def joke(ctx):
 @bot.command()
 async def coinflip(ctx):
     """Flips a coin."""
+    loggind.debug("call: coinflip()")
     if random.randint(0, 1):
         await ctx.send("Heads!")
 
@@ -367,8 +369,12 @@ async def coinflip(ctx):
 
 @bot.command()
 async def kiss(ctx, person):
-    """Kill people. Idk y."""
-    logging.debug("call: kill()")
+    """Kiss people. Idk y."""
+    logging.debug("call: kiss()")
+    if isFbb(person):
+        await ctx.send("no thank you, I refuse")
+        return
+
     if isMention(person):
         if int(ctx.message.author.id) == int(idFromMention(person)):
             await ctx.send("wut.")
