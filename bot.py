@@ -360,7 +360,7 @@ async def joke(ctx):
 @bot.command()
 async def coinflip(ctx):
     """Flips a coin."""
-    loggind.debug("call: coinflip()")
+    logging.debug("call: coinflip()")
     if random.randint(0, 1):
         await ctx.send("Heads!")
 
