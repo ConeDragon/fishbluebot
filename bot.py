@@ -404,6 +404,69 @@ async def kiss(ctx, person):
 
     await ctx.send(embed=embed)
 
+@bot.command()
+async def newticket(ctx, *args):
+
+    if len(args) < 1:
+        topic = "unknown topic"
+
+    else:
+        topic = " ".join(args)
+
+    ticket_channel = await ctx.guild.create_text_channel(
+        f"ticket-{ctx.message.author.name}-{topic}"
+    )
+    await ticket_channel.set_permissions(
+        ctx.guild.get_role(
+            ctx.guild.id
+        ),
+        send_messages=False,
+        read_messages=False
+    )
+
+    for role in ctx.guild.roles:
+        if role.permissions.manage_guild:
+            await ticket_channel.set_permissions(
+                role,
+                send_messages=True,
+                read_messages=True,
+                add_reactions=True,
+                embed_links=True,
+                attach_files=True,
+                read_message_history=True,
+                external_emojis=True
+            )
+
+    await ticket_channel.set_permissions(
+        ctx.author,
+        send_messages=True,
+        read_messages=True,
+        add_reactions=True,
+        embed_links=True,
+        attach_files=True,
+        read_message_history=True,
+        external_emojis=True
+    )
+    embed = discord.Embed(
+        title="Ticket Creator",
+        description=f"Your ticket has been created for {topic}.",
+        color=discord.Color.from_rgb(2, 0, 255)
+    )
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def closeticket(ctx):
+    if "ticket-" in ctx.channel.name:
+        await ctx.channel.delete()
+
+    else:
+        embed = discord.Embed(
+            title="Ticket Creator",
+            description="Please run this in the ticket channel you want to close!",
+            color = discord.Color.from_rgb(101, 3, 1)
+        )
+        await ctx.send(embed=embed)
+
 bot.run(
     str(
         os.getenv(
