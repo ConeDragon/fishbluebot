@@ -406,6 +406,8 @@ async def kiss(ctx, person):
 
 @bot.command(aliases=["new-ticket", "new_ticket"])
 async def newticket(ctx, *args):
+    """Allows you to open new tickets."""
+    logging.debug("call: newticket()")
     if len(args) < 1:
         topic = "unknown topic"
 
@@ -461,6 +463,8 @@ async def newticket(ctx, *args):
 
 @bot.command(aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
+    """ALlows you to close tickets."""
+    logging.debug("call: closeticket()")
     if "ticket-" in ctx.channel.name:
         await ctx.channel.delete()
 
