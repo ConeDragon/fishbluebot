@@ -244,10 +244,10 @@ async def magic8ball(ctx, *question):
 async def killswitch(ctx):
     """Killswitch"""
     logging.debug("call: killswitch()")
-    logging.info(f"Someone attempted to kill the bot, ID: {ctx.message.author.id}")
+    logging.info(f"Someone attempted to kill the bot, ID: {ctx.author.id}")
     await ctx.defer()
 
-    if isAuthorized(ctx.message.author.id):
+    if isAuthorized(ctx.author.id):
         await ctx.followup.send("I am now commiting die.")
         print("ouchie someone killed me")
         logging.warning("Exiting...")
@@ -263,12 +263,12 @@ async def kill(ctx, person):
     await ctx.defer()
 
     if isMention(person):
-        if int(ctx.message.author.id) == int(idFromMention(person)):
+        if int(ctx.author.id) == int(idFromMention(person)):
             await ctx.followup.send("Aw c'mon, don't kill yourself.")
             return
 
     else:
-        if person.strip() == ctx.message.author.name:
+        if person.strip() == ctx.author.name:
             await ctx.followup.send("Aw c'mon, don't kill yourself.")
             return
 
@@ -284,7 +284,7 @@ async def kill(ctx, person):
         pass
 
     embed = discord.Embed(
-        title=f"{ctx.message.author.name} has violently murdered {person}!",
+        title=f"{ctx.author.name} has violently murdered {person}!",
         description="oof",
     )
     embed.set_image(url=kawaii("kill"))
@@ -337,7 +337,7 @@ async def logsclear(ctx):
     """Clears logs of FBB."""
     logging.debug("call: logsclear()")
 
-    if isAuthorized(ctx.message.author.id):
+    if isAuthorized(ctx.author.id):
         with open("latest.log", "w") as f: pass
         await ctx.followup.send("Logs have been erased.")
         print("Logs have been erased.")
@@ -391,12 +391,12 @@ async def kiss(ctx, person):
         return
 
     if isMention(person):
-        if int(ctx.message.author.id) == int(idFromMention(person)):
+        if int(ctx.author.id) == int(idFromMention(person)):
             await ctx.followup.send("wut.")
             return
 
     else:
-        if person.strip() == ctx.message.author.name:
+        if person.strip() == ctx.author.name:
             await ctx.followup.send("wut.")
             return
 
@@ -412,7 +412,7 @@ async def kiss(ctx, person):
         pass
 
     embed = discord.Embed(
-        title=f"{ctx.message.author.name} has kissed {person}!",
+        title=f"{ctx.author.name} has kissed {person}!",
         description="idk what to say tbh",
     )
     embed.set_image(url=kawaii("kiss"))
@@ -432,7 +432,7 @@ async def newticket(ctx, *reason):
         topic = " ".join(reason)
 
     ticket_channel = await ctx.guild.create_text_channel(
-        f"ticket-{ctx.message.author.name}-{topic}",
+        f"ticket-{ctx.author.name}-{topic}",
         category=get(
             bot.get_guild(
                 837710846280073279
