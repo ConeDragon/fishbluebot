@@ -64,8 +64,11 @@ db = client["FBBDB"]
 
 #Bot stuff
 logging.debug("Defining bot constants...")
+pf = "fb."
 intents = discord.Intents.all()
 bot = commands.Bot(
+    command_prefix=pf,
+    strip_after_prefix=True,
     intents=intents
 )
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
@@ -176,7 +179,7 @@ async def on_message_listener(message):
         return
 
     if message.author.bot:
-        return
+        return #Prevent bots from running commands.
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -186,7 +189,7 @@ async def on_command_error(ctx, error):
             description="Unknown Command",
             color=discord.Color.red()
         )
-        await ctx.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
     elif isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         embed = discord.Embed(
@@ -194,7 +197,7 @@ async def on_command_error(ctx, error):
             description="You're missing an argument!",
             color=discord.Color.red()
         )
-        await ctx.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
     elif isinstance(error, commands.MissingPermissions):
         embed = discord.Embed(
@@ -202,7 +205,7 @@ async def on_command_error(ctx, error):
             description="Insufficient permissions!",
             color=discord.Color.red()
         )
-        await ctx.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
     else:
         embed = discord.Embed(
@@ -211,24 +214,22 @@ async def on_command_error(ctx, error):
             color=discord.Color.red()
         )
         embed.set_footer(text="Is this a bug? Report it to help make this bot better!")
-        await ctx.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
 # --Commands--
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def ping(ctx):
     """Ping"""
     logging.debug("call: ping()")
-    await ctx.defer()
-    await ctx.followup.send("pong")
+    await ctx.send("pong")
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
-async def magic8ball(ctx, *question):
+@bot.command(aliases=["8ball"])
+async def magic8ball(ctx, *args):
     """Magic 8-ball. Ask it your questions."""
     logging.debug("call: magic8ball()")
-    await ctx.defer()
     global m8answers
-    await ctx.followup.send(
+    await ctx.send(
         m8answers[
             ord(
                 os.urandom(
@@ -240,40 +241,36 @@ async def magic8ball(ctx, *question):
         ]
     )
     
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def killswitch(ctx):
     """Killswitch"""
     logging.debug("call: killswitch()")
     logging.info(f"Someone attempted to kill the bot, ID: {ctx.message.author.id}")
-    await ctx.defer()
-
     if isAuthorized(ctx.message.author.id):
-        await ctx.followup.send("I am now commiting die.")
+        await ctx.send("I am now commiting die.")
         print("ouchie someone killed me")
         logging.warning("Exiting...")
         sys.exit()
         
     else:
-        await ctx.followup.send("rude why are you trying to kill me >:(")
+        await ctx.send("rude why are you trying to kill me >:(")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def kill(ctx, person):
     """Kill people. Idk y."""
     logging.debug("call: kill()")
-    await ctx.defer()
-
     if isMention(person):
         if int(ctx.message.author.id) == int(idFromMention(person)):
-            await ctx.followup.send("Aw c'mon, don't kill yourself.")
+            await ctx.send("Aw c'mon, don't kill yourself.")
             return
 
     else:
         if person.strip() == ctx.message.author.name:
-            await ctx.followup.send("Aw c'mon, don't kill yourself.")
+            await ctx.send("Aw c'mon, don't kill yourself.")
             return
 
     if ("@everyone" in person) or ("@here" in person):
-        await ctx.followup.send("Mass genocide isn't allowed yet. Try again later.")
+        await ctx.send("Mass genocide isn't allowed yet. Try again later.")
         return
 
     if isMention(person):
@@ -289,30 +286,24 @@ async def kill(ctx, person):
     )
     embed.set_image(url=kawaii("kill"))
 
-    await ctx.followup.send(embed=embed)
+    await ctx.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def bruh(ctx):
     """Bruh."""
     logging.debug("call: bruh()")
-    await ctx.defer()
-
-    await ctx.followup.send("""██████╗░██████╗░██╗░░░██╗██╗░░██╗░░░
+    await ctx.send("""██████╗░██████╗░██╗░░░██╗██╗░░██╗░░░
 ██╔══██╗██╔══██╗██║░░░██║██║░░██║░░░
 ██████╦╝██████╔╝██║░░░██║███████║░░░
 ██╔══██╗██╔══██╗██║░░░██║██╔══██║░░░
 ██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
 ╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def tree(ctx, size=3):
     """Prints little trees."""
-    logging.debug("call: tree()")
-    await ctx.defer()
-
-    size = int(size)
     if size > 30:
-        await ctx.followup.send("DoSing me is illegal at the moment.")
+        await ctx.send("DoSing me is illegal at the moment.")
         return
 
     else:
@@ -330,27 +321,23 @@ async def tree(ctx, size=3):
         for i in range(0, int(math.ceil(size / 20))):
             out += char.center(b) + "\n"
 
-        await ctx.followup.send("```" + chr(8203) + out[:-1] + "```")
+        await ctx.send("```" + chr(8203) + out[:-1] + "```")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def logsclear(ctx):
     """Clears logs of FBB."""
-    logging.debug("call: logsclear()")
-
     if isAuthorized(ctx.message.author.id):
         with open("latest.log", "w") as f: pass
-        await ctx.followup.send("Logs have been erased.")
+        await ctx.send("Logs have been erased.")
         print("Logs have been erased.")
 
     else:
-        await ctx.followup.send("You don't have sufficient permissions to run this command.")
+        await ctx.send("You don't have sufficient permissions to run this command.")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def joke(ctx):
     """Prints a random corny joke."""
     logging.debug("call: joke()")
-    await ctx.defer()
-
     j = await Jokes()
     jk = await j.get_joke(
         blacklist=[
@@ -361,47 +348,43 @@ async def joke(ctx):
     )
 
     if jk["type"] == "single":
-        await ctx.followup.send(jk["joke"])
+        await ctx.send(jk["joke"])
 
     else:
-        await ctx.followup.send(jk["setup"])
+        await ctx.send(jk["setup"])
         await asyncio.sleep(1)
-        await ctx.followup.send(jk["delivery"])
+        await ctx.send(jk["delivery"])
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def coinflip(ctx):
     """Flips a coin."""
     logging.debug("call: coinflip()")
-    await ctx.defer()
-
     if random.randint(0, 1):
-        await ctx.followup.send("Heads!")
+        await ctx.send("Heads!")
 
     else:
-        await ctx.followup.send("Tails!")
+        await ctx.send("Tails!")
 
-@bot.slash_command(guild_ids=[837710846280073279])
+@bot.command()
 async def kiss(ctx, person):
     """Kiss people. Idk y."""
     logging.debug("call: kiss()")
-    await ctx.defer()
-
     if isFbb(person):
-        await ctx.followup.send("no thank you, I refuse")
+        await ctx.send("no thank you, I refuse")
         return
 
     if isMention(person):
         if int(ctx.message.author.id) == int(idFromMention(person)):
-            await ctx.followup.send("wut.")
+            await ctx.send("wut.")
             return
 
     else:
         if person.strip() == ctx.message.author.name:
-            await ctx.followup.send("wut.")
+            await ctx.send("wut.")
             return
 
     if ("@everyone" in person) or ("@here" in person):
-        await ctx.followup.send("oof ur being real amorous here")
+        await ctx.send("oof ur being real amorous here")
         return
 
     if isMention(person):
@@ -417,19 +400,17 @@ async def kiss(ctx, person):
     )
     embed.set_image(url=kawaii("kiss"))
 
-    await ctx.followup.send(embed=embed)
+    await ctx.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["new-ticket", "new_ticket"])
-async def newticket(ctx, *reason):
+@bot.command(aliases=["new-ticket", "new_ticket"])
+async def newticket(ctx, *args):
     """Allows you to open new tickets."""
     logging.debug("call: newticket()")
-    await ctx.defer()
-
-    if len(reason) < 1:
+    if len(args) < 1:
         topic = "unknown topic"
 
     else:
-        topic = " ".join(reason)
+        topic = " ".join(args)
 
     ticket_channel = await ctx.guild.create_text_channel(
         f"ticket-{ctx.message.author.name}-{topic}",
@@ -476,14 +457,12 @@ async def newticket(ctx, *reason):
         description=f"Your ticket has been created for {topic}.",
         color=discord.Color.from_rgb(2, 0, 255)
     )
-    await ctx.followup.send(embed=embed)
+    await ctx.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["close-ticket", "close_ticket"])
+@bot.command(aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
     """ALlows you to close tickets."""
     logging.debug("call: closeticket()")
-    await ctx.defer()
-
     if "ticket-" in ctx.channel.name:
         await ctx.channel.delete()
 
@@ -493,7 +472,7 @@ async def closeticket(ctx):
             description="Please run this in the ticket channel you want to close!",
             color = discord.Color.from_rgb(101, 3, 1)
         )
-        await ctx.followup.send(embed=embed)
+        await ctx.send(embed=embed)
 
 bot.run(
     str(
