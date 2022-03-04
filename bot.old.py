@@ -461,7 +461,7 @@ async def newticket(ctx, *args):
 
 @bot.command(aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
-    """ALlows you to close tickets."""
+    """Allows you to close tickets."""
     logging.debug("call: closeticket()")
     if "ticket-" in ctx.channel.name:
         await ctx.channel.delete()

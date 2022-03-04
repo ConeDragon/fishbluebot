@@ -78,7 +78,6 @@ with open("dat.json", "r") as f:
     #Load crap from data file
     yeetus = json.loads(f.read())
     m8answers = yeetus["8ball"]
-    jokes = yeetus["jokes"]
     del yeetus
 
 # --Functions--
@@ -220,6 +219,7 @@ async def ping(ctx):
     """Ping"""
     logging.debug("call: ping()")
     await ctx.defer()
+    
     await ctx.followup.send("pong")
 
 @bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
@@ -352,21 +352,24 @@ async def joke(ctx):
     await ctx.defer()
 
     j = await Jokes()
-    jk = await j.get_joke(
-        blacklist=[
-            "nsfw",
-            "racist",
-            "sexist"
-        ]
-    )
+    jk = {}
+
+    while jk == {}:
+        jk = await j.get_joke(
+            blacklist=[
+                "nsfw",
+                "racist",
+                "sexist"
+            ]
+        )
 
     if jk["type"] == "single":
         await ctx.followup.send(jk["joke"])
 
     else:
-        await ctx.followup.send(jk["setup"])
+        jsetup = await ctx.followup.send(jk["setup"])
         await asyncio.sleep(1)
-        await ctx.followup.send(jk["delivery"])
+        await jsetup.edit(jk["setup"] + "\n" + jk["delivery"])
 
 @bot.slash_command(guild_ids=[837710846280073279])
 async def coinflip(ctx):
@@ -420,7 +423,7 @@ async def kiss(ctx, person):
     await ctx.followup.send(embed=embed)
 
 @bot.slash_command(guild_ids=[837710846280073279], aliases=["new-ticket", "new_ticket"])
-async def newticket(ctx, *reason):
+async def newticket(ctx, *, reason):
     """Allows you to open new tickets."""
     logging.debug("call: newticket()")
     await ctx.defer()
@@ -429,7 +432,7 @@ async def newticket(ctx, *reason):
         topic = "unknown topic"
 
     else:
-        topic = " ".join(reason)
+        topic = "".join(reason)
 
     ticket_channel = await ctx.guild.create_text_channel(
         f"ticket-{ctx.author.name}-{topic}",
