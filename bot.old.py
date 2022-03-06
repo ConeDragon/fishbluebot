@@ -463,7 +463,7 @@ async def newticket(ctx, *args):
 async def closeticket(ctx):
     """Allows you to close tickets."""
     logging.debug("call: closeticket()")
-    if "ticket-" in ctx.channel.name:
+    if ctx.channel.name.startswith("ticket-"):
         await ctx.channel.delete()
 
     else:

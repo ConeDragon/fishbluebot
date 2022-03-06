@@ -223,13 +223,13 @@ async def ping(ctx):
     await ctx.followup.send("pong")
 
 @bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
-async def magic8ball(ctx, *question):
+async def magic8ball(ctx, *, question):
     """Magic 8-ball. Ask it your questions."""
     logging.debug("call: magic8ball()")
     await ctx.defer()
     global m8answers
     await ctx.followup.send(
-        m8answers[
+        "In response to question \"" + "".join(question) + "\"\n" + m8answers[
             ord(
                 os.urandom(
                     1
@@ -487,7 +487,7 @@ async def closeticket(ctx):
     logging.debug("call: closeticket()")
     await ctx.defer()
 
-    if "ticket-" in ctx.channel.name:
+    if ctx.channel.name.startswith("ticket-"):
         await ctx.channel.delete()
 
     else:
