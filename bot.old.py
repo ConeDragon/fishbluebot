@@ -81,7 +81,6 @@ with open("dat.json", "r") as f:
     #Load crap from data file
     yeetus = json.loads(f.read())
     m8answers = yeetus["8ball"]
-    jokes = yeetus["jokes"]
     del yeetus
 
 # --Functions--
