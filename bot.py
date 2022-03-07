@@ -156,6 +156,11 @@ def kawaii(sub):
     r = requests.get(f"https://kawaii.red/api/gif/{sub}/token={kawaiit}/")
     return str(r.json()['response'])
 
+def fullName(author):
+    #Returns name + tag from user/Member object
+    logging.debug("call: fullName()")
+    return author.name + "#" + author.discriminator
+
 # --Discord Events--
 logging.debug("Defining commands...")
 @bot.event
@@ -483,7 +488,7 @@ async def newticket(ctx, *, reason):
 
 @bot.slash_command(guild_ids=[837710846280073279], aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
-    """ALlows you to close tickets."""
+    """Allows you to close tickets."""
     logging.debug("call: closeticket()")
     await ctx.defer()
 
