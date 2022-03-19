@@ -219,7 +219,7 @@ async def on_command_error(ctx, error):
 
 # --Commands--
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def ping(ctx):
     """Ping"""
     logging.debug("call: ping()")
@@ -227,7 +227,7 @@ async def ping(ctx):
     
     await ctx.followup.send("pong")
 
-@bot.slash_command(aliases=["8ball"])
+@bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
 async def magic8ball(ctx, *, question):
     """Magic 8-ball. Ask it your questions."""
     logging.debug("call: magic8ball()")
@@ -245,7 +245,7 @@ async def magic8ball(ctx, *, question):
         ]
     )
     
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def killswitch(ctx):
     """Killswitch"""
     logging.debug("call: killswitch()")
@@ -261,7 +261,7 @@ async def killswitch(ctx):
     else:
         await ctx.followup.send("rude why are you trying to kill me >:(")
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def kill(ctx, person):
     """Kill people. Idk y."""
     logging.debug("call: kill()")
@@ -296,7 +296,7 @@ async def kill(ctx, person):
 
     await ctx.followup.send(embed=embed)
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def bruh(ctx):
     """Bruh."""
     logging.debug("call: bruh()")
@@ -309,7 +309,7 @@ async def bruh(ctx):
 ██████╦╝██║░░██║╚██████╔╝██║░░██║██╗
 ╚═════╝░╚═╝░░╚═╝░╚═════╝░╚═╝░░╚═╝╚═╝""")
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def tree(ctx, size=3):
     """Prints little trees."""
     logging.debug("call: tree()")
@@ -337,7 +337,7 @@ async def tree(ctx, size=3):
 
         await ctx.followup.send("```" + chr(8203) + out[:-1] + "```")
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def logsclear(ctx):
     """Clears logs of FBB."""
     logging.debug("call: logsclear()")
@@ -350,7 +350,7 @@ async def logsclear(ctx):
     else:
         await ctx.followup.send("You don't have sufficient permissions to run this command.")
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def joke(ctx):
     """Prints a random corny joke."""
     logging.debug("call: joke()")
@@ -376,7 +376,7 @@ async def joke(ctx):
         await asyncio.sleep(1)
         await jsetup.edit(jk["setup"] + "\n" + jk["delivery"])
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def coinflip(ctx):
     """Flips a coin."""
     logging.debug("call: coinflip()")
@@ -388,7 +388,7 @@ async def coinflip(ctx):
     else:
         await ctx.followup.send("Tails!")
 
-@bot.slash_command()
+@bot.slash_command(guild_ids=[837710846280073279])
 async def kiss(ctx, person):
     """Kiss people. Idk y."""
     logging.debug("call: kiss()")
@@ -427,7 +427,7 @@ async def kiss(ctx, person):
 
     await ctx.followup.send(embed=embed)
 
-@bot.slash_command(aliases=["new-ticket", "new_ticket"])
+@bot.slash_command(guild_ids=[837710846280073279], aliases=["new-ticket", "new_ticket"])
 async def newticket(ctx, *, reason):
     """Allows you to open new tickets."""
     logging.debug("call: newticket()")
@@ -486,7 +486,7 @@ async def newticket(ctx, *, reason):
     )
     await ctx.followup.send(embed=embed)
 
-@bot.slash_command(aliases=["close-ticket", "close_ticket"])
+@bot.slash_command(guild_ids=[837710846280073279], aliases=["close-ticket", "close_ticket"])
 async def closeticket(ctx):
     """Allows you to close tickets."""
     logging.debug("call: closeticket()")
