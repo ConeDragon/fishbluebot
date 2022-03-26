@@ -70,7 +70,7 @@ bot = commands.Bot(
 )
 mentionre = re.compile(r"(.*<@[0-9]+>.*)|(.*<@![0-9]+>.*)")
 msgst = {}
-kawaiit = "767200055652253719.cTHpJ7bN9V0xFjdK5pWh"
+kawaiit = str(os.getenv("KAWAII"))
 
 #Reading from file
 logging.debug("Reading things from data JSON file...")
