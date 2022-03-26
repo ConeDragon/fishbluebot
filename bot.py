@@ -38,11 +38,11 @@ from jokeapi import Jokes
 #Import all speedy jsons, use default json module as failsafe
 try:
     import ujson as json
-    
+
 except (ModuleNotFoundError, ImportError):
     try:
         import simplejson as json
-        
+
     except (ModuleNotFoundError, ImportError):
         import json
 
@@ -100,10 +100,10 @@ def isAuthorized(i):
     logging.debug("call: isAuthorized()")
     if (i == 588132098875850752) or (i == 832740090094682152):
         return True
-    
+
     else:
         return False
-    
+
 def isFbb(text):
     """Is text fishbluebot"""
     logging.debug("call: isFbb()")
@@ -127,7 +127,7 @@ def isFbb(text):
         ) + ">"
     ):
         return True
-    
+
     else:
         return False
 
@@ -167,7 +167,7 @@ logging.debug("Defining commands...")
 async def on_ready():
     """logged in?"""
     logging.debug("call: on_ready()")
-    print(f"fishbluebot has logged on in to Discord as {bot.user}!")
+    print(f"fishbluebot has logged on in to Discord as {bot.user} with slash commands!")
 
 @bot.listen("on_message")
 async def on_message_listener(message):
@@ -224,10 +224,10 @@ async def ping(ctx):
     """Ping"""
     logging.debug("call: ping()")
     await ctx.defer()
-    
+
     await ctx.followup.send("pong")
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["8ball"])
+@bot.slash_command(guild_ids=[837710846280073279])
 async def magic8ball(ctx, *, question):
     """Magic 8-ball. Ask it your questions."""
     logging.debug("call: magic8ball()")
@@ -244,7 +244,7 @@ async def magic8ball(ctx, *, question):
             )
         ]
     )
-    
+
 @bot.slash_command(guild_ids=[837710846280073279])
 async def killswitch(ctx):
     """Killswitch"""
@@ -257,7 +257,7 @@ async def killswitch(ctx):
         print("ouchie someone killed me")
         logging.warning("Exiting...")
         sys.exit()
-        
+
     else:
         await ctx.followup.send("rude why are you trying to kill me >:(")
 
@@ -427,7 +427,7 @@ async def kiss(ctx, person):
 
     await ctx.followup.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["new-ticket", "new_ticket"])
+@bot.slash_command(guild_ids=[837710846280073279])
 async def newticket(ctx, *, reason):
     """Allows you to open new tickets."""
     logging.debug("call: newticket()")
@@ -445,7 +445,7 @@ async def newticket(ctx, *, reason):
             bot.get_guild(
                 837710846280073279
             ).categories,
-            id=946872728361791499
+            id=956664290553782324
         )
     )
     await ticket_channel.set_permissions(
@@ -486,7 +486,7 @@ async def newticket(ctx, *, reason):
     )
     await ctx.followup.send(embed=embed)
 
-@bot.slash_command(guild_ids=[837710846280073279], aliases=["close-ticket", "close_ticket"])
+@bot.slash_command(guild_ids=[837710846280073279])
 async def closeticket(ctx):
     """Allows you to close tickets."""
     logging.debug("call: closeticket()")

@@ -38,11 +38,11 @@ from jokeapi import Jokes
 #Import all speedy jsons, use default json module as failsafe
 try:
     import ujson as json
-    
+
 except (ModuleNotFoundError, ImportError):
     try:
         import simplejson as json
-        
+
     except (ModuleNotFoundError, ImportError):
         import json
 
@@ -103,10 +103,10 @@ def isAuthorized(i):
     logging.debug("call: isAuthorized()")
     if (i == 588132098875850752) or (i == 832740090094682152):
         return True
-    
+
     else:
         return False
-    
+
 def isFbb(text):
     """Is text fishbluebot"""
     logging.debug("call: isFbb()")
@@ -130,7 +130,7 @@ def isFbb(text):
         ) + ">"
     ):
         return True
-    
+
     else:
         return False
 
@@ -239,7 +239,7 @@ async def magic8ball(ctx, *args):
             )
         ]
     )
-    
+
 @bot.command()
 async def killswitch(ctx):
     """Killswitch"""
@@ -250,7 +250,7 @@ async def killswitch(ctx):
         print("ouchie someone killed me")
         logging.warning("Exiting...")
         sys.exit()
-        
+
     else:
         await ctx.send("rude why are you trying to kill me >:(")
 
@@ -417,7 +417,7 @@ async def newticket(ctx, *args):
             bot.get_guild(
                 837710846280073279
             ).categories,
-            id=946872728361791499
+            id=956664290553782324
         )
     )
     await ticket_channel.set_permissions(
