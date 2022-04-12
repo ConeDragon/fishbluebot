@@ -1,6 +1,0 @@
-py-cord==2.0.0b5
-python-dotenv
-asyncio
-pymongo[srv]
-certifi
-jokeapi
