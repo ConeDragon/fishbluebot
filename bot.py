@@ -168,6 +168,7 @@ async def on_ready():
     """logged in?"""
     logging.debug("call: on_ready()")
     print(f"fishbluebot has logged on in to Discord as {bot.user} with slash commands!")
+    await bot.change_presence(activity=discord.Game(name="with joe mama"))
 
 @bot.listen("on_message")
 async def on_message_listener(message):
@@ -180,10 +181,14 @@ async def on_message_listener(message):
         return
 
     if message.author.bot:
-        return
+        return #Prevent bots from running commands.
+
+    if "f%diagnostics%" in message.content:
+        # diagnostics
+        await message.channel.send("testing... 1 2 3 testing...")
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_application_command_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.CommandNotFound):
         embed = discord.Embed(
             title="Error",

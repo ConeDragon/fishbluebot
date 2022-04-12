@@ -145,7 +145,6 @@ def isMention(text):
     else:
         return True
 
-
 def idFromMention(mention):
     #Get User ID from mention
     logging.debug("call: idFromMention()")
@@ -179,6 +178,10 @@ async def on_message_listener(message):
 
     if message.author.bot:
         return #Prevent bots from running commands.
+
+    if "f%diagnostics%" in message.content:
+        # diagnostics
+        await message.channel.send("testing... 1 2 3 testing...")
 
 @bot.event
 async def on_command_error(ctx, error):
