@@ -226,6 +226,12 @@ async def ping(ctx):
     logging.debug("call: ping()")
     await ctx.send("pong")
 
+@bot.command()
+async def pong(ctx):
+    """Pong"""
+    logging.debug("call: pong()")
+    await ctx.send("ping")
+
 @bot.command(aliases=["8ball"])
 async def magic8ball(ctx, *args):
     """Magic 8-ball. Ask it your questions."""
@@ -475,6 +481,43 @@ async def closeticket(ctx):
             color = discord.Color.from_rgb(101, 3, 1)
         )
         await ctx.send(embed=embed)
+
+@bot.command()
+async def slap(ctx, person):
+    """Slap people almost to death."""
+    logging.debug("call: slap()")
+    if isFbb(person):
+        await ctx.send("might I recommend this therapist I know to you?")
+        return
+
+    if isMention(person):
+        if int(ctx.message.author.id) == int(idFromMention(person)):
+            await ctx.send("The United States Suicide Prevention Lifeline's phone number is (800) 273-8255")
+            return
+
+    else:
+        if person.strip() == ctx.message.author.name:
+            await ctx.send("The United States Pls Don't Kill Urself Hotline Or Something Idk's phone number is (696) 420-6969")
+            return
+
+    if ("@everyone" in person) or ("@here" in person):
+        await ctx.send("f u bud (btw mode r gonna kill u for everyone pinging now glhf)")
+        return
+
+    if isMention(person):
+        person = await bot.fetch_user(int(idFromMention(person)))
+        person = person.name
+
+    else:
+        pass
+
+    embed = discord.Embed(
+        title=f"{ctx.message.author.name} has slapped {person}!",
+        description=f"I think {person} needs an ambulance or something",
+    )
+    embed.set_image(url=kawaii("slap"))
+
+    await ctx.send(embed=embed)
 
 bot.run(
     str(

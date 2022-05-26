@@ -1,4 +1,4 @@
-# Doesn't support slash commands, probs gonna get yeeted by Discord
+# Supports slash commands, but they're shit
 #Requirements (to use this script, install v):
 #pip install py-cord python-dotenv asyncio pymongo[srv] certifi
 
