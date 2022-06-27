@@ -164,6 +164,7 @@ logging.debug("Defining commands...")
 async def on_ready():
     """logged in?"""
     logging.debug("call: on_ready()")
+    await bot.change_presence(activity=discord.Game(name="with joe mama"))
     print(f"fishbluebot has logged on in to Discord as {bot.user}!")
 
 @bot.listen("on_message")
