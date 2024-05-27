@@ -14,6 +14,9 @@ logging.basicConfig(
 )
 logging.debug("1.0.0.2")
 
+logging.debug("Pausing for internet check...")
+input("Press enter to start boot... (needs internet connection)")
+
 #Imports
 logging.debug("Importing...")
 import discord
@@ -373,6 +376,14 @@ async def coinflip(ctx):
 
     else:
         await ctx.send("Tails!")
+
+@bot.command()
+async def pwn(ctx):
+    """lol"""
+    logging.debug("call: pwn()")
+    channel = bot.get_channel(854360133504598036)
+    message = await channel.fetch_message(channel.last_message_id)
+    await message.add_reaction("🫃")
 
 @bot.command()
 async def kiss(ctx, person):
