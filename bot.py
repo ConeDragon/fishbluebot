@@ -1,6 +1,6 @@
 # Supports slash commands, but they're shit
-#Requirements (to use this script, install v):
-#pip install py-cord python-dotenv asyncio pymongo[srv] certifi
+# Requirements (to use this script, install v):
+# pip install py-cord python-dotenv asyncio pymongo[srv] certifi
 
 #Logging
 import logging
